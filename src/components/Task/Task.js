@@ -1,7 +1,11 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { formatDistanceToNow } from 'date-fns'
-import './Task.css'
+import classNames from 'classnames'
+
+import styles from './Task.css'
+
+const cx = classNames.bind(styles)
 
 class Task extends Component {
   static defaultProps = {
@@ -47,8 +51,13 @@ class Task extends Component {
   render() {
     const { onDeleted, onToggleCompleted, completed, editing, id, createTime, editingTask } = this.props
     const { label } = this.state
+    const btnClass = cx({
+      '': true,
+      completed: completed,
+      editing: editing,
+    })
     return (
-      <li className={completed ? 'completed' : editing ? 'editing' : null}>
+      <li className={btnClass}>
         <div className="view">
           <input
             className="toggle"

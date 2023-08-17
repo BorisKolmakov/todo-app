@@ -111,8 +111,7 @@ class App extends Component {
   render() {
     const { todoData, activeFilter } = this.state
     const filteredTodoData = this.taskFilter()
-    const completedCount = todoData.filter((el) => el.completed).length
-    const todoCount = todoData.length - completedCount
+    const todoCount = todoData.filter((el) => !el.completed).length
     return (
       <section className="todoapp">
         <header className="header">
@@ -129,7 +128,6 @@ class App extends Component {
           />
           <Footer
             toDo={todoCount}
-            completed={completedCount}
             btnFilter={this.btnFilter}
             activeFilter={activeFilter}
             clearCompleted={this.clearCompleted}
