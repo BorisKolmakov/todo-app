@@ -1,1 +1,1 @@
-https://todo-app-boriskolmakov.vercel.app/
+https://todo-app-timer-boriskolmakov.vercel.app/
