@@ -13,20 +13,33 @@ class NewTaskForm extends Component {
 
   state = {
     label: '',
+    min: '',
+    sec: '',
   }
 
   onLabelChange = (e) => {
-    this.setState({
-      label: e.target.value,
-    })
+    const inputFiledName = e.target.placeholder
+    switch (inputFiledName) {
+      case 'Min':
+        this.setState({ min: e.target.value })
+        break
+      case 'Sec':
+        this.setState({ sec: e.target.value })
+        break
+      default:
+        this.setState({ label: e.target.value })
+        break
+    }
   }
 
   onSubmit = (e) => {
     e.preventDefault()
     if (this.state.label) {
-      this.props.onTaskAdded(this.state.label)
+      this.props.onTaskAdded(this.state.label, this.state.min, this.state.sec)
       this.setState({
         label: '',
+        min: '',
+        sec: '',
       })
     }
   }
@@ -41,6 +54,27 @@ class NewTaskForm extends Component {
           onChange={this.onLabelChange}
           value={this.state.label}
         />
+        <input
+          type="number"
+          className="new-todo-form__timer"
+          value={this.state.min}
+          onChange={this.onLabelChange}
+          placeholder="Min"
+          required
+          min={0}
+          max={60}
+        />
+        <input
+          type="number"
+          className="new-todo-form__timer"
+          value={this.state.sec}
+          onChange={this.onLabelChange}
+          placeholder="Sec"
+          required
+          min={0}
+          max={60}
+        />
+        <button type="submit"></button>
       </form>
     )
   }

@@ -13,13 +13,17 @@ class App extends Component {
     activeFilter: 'all',
   }
 
-  createTodoItem(label) {
+  createTodoItem(label, min = 1, sec = 7) {
     return {
       label: label,
       createTime: new Date(),
       completed: false,
       editing: false,
       id: this.maxId++,
+      timer: {
+        minute: min,
+        second: sec,
+      },
     }
   }
 
@@ -35,11 +39,12 @@ class App extends Component {
     })
   }
 
-  onTaskAdded = (label) => {
+  onTaskAdded = (label, min, sec) => {
     this.setState((state) => {
-      const item = this.createTodoItem(label)
+      const item = this.createTodoItem(label, min, sec)
       return { todoData: [...state.todoData, item] }
     })
+    console.log(label, min, sec)
   }
 
   toggleProperty = (arr, id, propName) => {
@@ -51,7 +56,6 @@ class App extends Component {
   }
 
   changeLabelTask = (arr, id, label) => {
-    console.log(id)
     const idx = arr.findIndex((item) => item.id === id)
     const oldItem = arr[idx]
     const newItem = { ...oldItem, label: label }
@@ -80,6 +84,24 @@ class App extends Component {
       }
     })
     this.editingTask(id)
+  }
+
+  updateTaskTimer = (id, minute, second) => {
+    if (minute >= 0 && second > 0) {
+      this.setState(({ todoData }) => {
+        const idx = todoData.findIndex((el) => el.id === id)
+        const oldItem = todoData[idx]
+        const newItem = { ...oldItem, timer: { minute, second } }
+
+        return { todoData: [...todoData.slice(0, idx), newItem, ...todoData.slice(idx + 1)] }
+      })
+    } else {
+      this.setState(({ todoData }) => {
+        return {
+          todoData: this.toggleProperty(todoData, id, 'completed'),
+        }
+      })
+    }
   }
 
   taskFilter = () => {
@@ -125,6 +147,7 @@ class App extends Component {
             editingTask={this.editingTask}
             onToggleCompleted={this.onToggleCompleted}
             tasks={filteredTodoData}
+            updateTaskTimer={this.updateTaskTimer}
           />
           <Footer
             toDo={todoCount}

@@ -1,7 +1,9 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { formatDistanceToNow } from 'date-fns'
 import classNames from 'classnames'
+
+import { TimeCreateTask } from '../TimeCreateTask'
+import { Timer } from '../Timer'
 
 import styles from './Task.css'
 
@@ -34,6 +36,10 @@ class Task extends Component {
     label: this.props.label,
   }
 
+  componentDidMount() {
+    this.interval
+  }
+
   onChange = (evt) => {
     this.setState({ label: evt.target.value })
   }
@@ -49,7 +55,8 @@ class Task extends Component {
   }
 
   render() {
-    const { onDeleted, onToggleCompleted, completed, editing, id, createTime, editingTask } = this.props
+    const { onDeleted, onToggleCompleted, completed, editing, id, editingTask, createTime, timer, updateTaskTimer } =
+      this.props
     const { label } = this.state
     const btnClass = cx({
       '': true,
@@ -67,9 +74,12 @@ class Task extends Component {
             checked={completed}
           />
           <label htmlFor={`${id}__check`} onClick={onToggleCompleted}>
-            <span className="description">{label}</span>
-            <span className="created">created {formatDistanceToNow(createTime)} ago</span>
+            <span className="title">{label}</span>
           </label>
+          <Timer {...timer} updateTaskTimer={updateTaskTimer} id={id} />
+          <span className="description">
+            created <TimeCreateTask time={createTime} />
+          </span>
           <button className="icon icon-edit" onClick={editingTask}></button>
           <button className="icon icon-destroy" onClick={onDeleted}></button>
         </div>

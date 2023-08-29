@@ -5,7 +5,7 @@ import Task from '../Task'
 
 import './TaskList.css'
 
-const TaskList = ({ tasks, onDeleted, onToggleCompleted, editTask, editingTask }) => {
+const TaskList = ({ tasks, onDeleted, onToggleCompleted, editTask, editingTask, updateTaskTimer }) => {
   const elements = tasks.map((item) => {
     const { ...itemProps } = item
     return (
@@ -16,6 +16,7 @@ const TaskList = ({ tasks, onDeleted, onToggleCompleted, editTask, editingTask }
         editTask={(label) => editTask(item.id, label)}
         editingTask={() => editingTask(item.id)}
         onToggleCompleted={() => onToggleCompleted(item.id)}
+        updateTaskTimer={updateTaskTimer}
       />
     )
   })
