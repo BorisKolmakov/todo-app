@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { formatDistanceToNow } from 'date-fns'
 import classNames from 'classnames'
+
+import { TimeCreateTask } from '../TimeCreateTask'
 
 import styles from './Task.css'
 
@@ -14,6 +15,8 @@ class Task extends Component {
     id: 1,
     label: '',
     createTime: new Date(),
+    min: 0,
+    sec: 0,
     onToggleCompleted: () => {},
     editingTask: () => {},
     onDeleted: () => {},
@@ -28,6 +31,8 @@ class Task extends Component {
     onToggleCompleted: PropTypes.func,
     editingTask: PropTypes.func,
     onDeleted: PropTypes.func,
+    min: PropTypes.number,
+    sec: PropTypes.number,
   }
 
   state = {
@@ -48,8 +53,34 @@ class Task extends Component {
     }
   }
 
+  escFunction = (evt) => {
+    if (evt.key === 'Escape') {
+      const { editingTask, id } = this.props
+      this.setState({ label: this.props.label })
+      editingTask(id)
+    }
+  }
+
+  blurFunction = () => {
+    const { editingTask, id } = this.props
+    this.setState({ label: this.props.label })
+    editingTask(id)
+  }
+
   render() {
-    const { onDeleted, onToggleCompleted, completed, editing, id, createTime, editingTask } = this.props
+    const {
+      onDeleted,
+      onToggleCompleted,
+      completed,
+      editing,
+      id,
+      editingTask,
+      createTime,
+      startTimer,
+      stopTimer,
+      minute,
+      second,
+    } = this.props
     const { label } = this.state
     const btnClass = cx({
       '': true,
@@ -67,17 +98,32 @@ class Task extends Component {
             checked={completed}
           />
           <label htmlFor={`${id}__check`} onClick={onToggleCompleted}>
-            <span className="description">{label}</span>
-            <span className="created">created {formatDistanceToNow(createTime)} ago</span>
+            <span className="title">{label}</span>
           </label>
+          <span className="description">
+            <button className="icon icon-play" onClick={startTimer}></button>
+            <button className="icon icon-pause" onClick={stopTimer}></button>
+            {minute < 10 ? `0${minute}` : minute}:{second < 10 ? `0${second}` : second}
+          </span>
+          <span className="description">
+            created <TimeCreateTask time={createTime} />
+          </span>
           <button className="icon icon-edit" onClick={editingTask}></button>
           <button className="icon icon-destroy" onClick={onDeleted}></button>
         </div>
-        {editing ? (
+        {editing && (
           <form onSubmit={this.onSubmit}>
-            <input type="text" className="edit" value={this.state.label} autoFocus onChange={this.onChange} />
+            <input
+              type="text"
+              className="edit"
+              value={this.state.label}
+              autoFocus
+              onChange={this.onChange}
+              onKeyDown={this.escFunction}
+              onBlur={this.blurFunction}
+            />
           </form>
-        ) : null}
+        )}
       </li>
     )
   }

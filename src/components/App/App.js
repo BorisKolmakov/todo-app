@@ -11,15 +11,19 @@ class App extends Component {
   state = {
     todoData: [],
     activeFilter: 'all',
+    minute: '',
+    second: '',
   }
 
-  createTodoItem(label) {
+  createTodoItem(label, min = 1, sec = 7) {
     return {
       label: label,
       createTime: new Date(),
       completed: false,
       editing: false,
       id: this.maxId++,
+      minute: min,
+      second: sec,
     }
   }
 
@@ -35,9 +39,9 @@ class App extends Component {
     })
   }
 
-  onTaskAdded = (label) => {
+  onTaskAdded = (label, min, sec) => {
     this.setState((state) => {
-      const item = this.createTodoItem(label)
+      const item = this.createTodoItem(label, min, sec)
       return { todoData: [...state.todoData, item] }
     })
   }
@@ -51,7 +55,6 @@ class App extends Component {
   }
 
   changeLabelTask = (arr, id, label) => {
-    console.log(id)
     const idx = arr.findIndex((item) => item.id === id)
     const oldItem = arr[idx]
     const newItem = { ...oldItem, label: label }
@@ -108,32 +111,104 @@ class App extends Component {
     }))
   }
 
+  startTimer = (id) => {
+    const { isTimerOn } = this.state.todoData.find((el) => el.id === id)
+
+    if (!isTimerOn) {
+      const timerId = setInterval(() => {
+        this.setState((prevState) => {
+          const updateTodo = prevState.todoData.map((todoItem) => {
+            if (todoItem.id === id) {
+              if (todoItem.second === 0 && todoItem.minute === 0) {
+                this.stopTimer(id)
+              }
+              let sec = todoItem.second - 1
+              let min = todoItem.minute
+              if (min > 0 && sec < 0) {
+                min -= 1
+                sec = 59
+              }
+
+              if (min === 0 && sec < 0) {
+                sec = 0
+                this.stopTimer(id)
+              }
+
+              return {
+                ...todoItem,
+                second: sec,
+                minute: min,
+              }
+            }
+
+            return todoItem
+          })
+
+          return {
+            todoData: updateTodo,
+          }
+        })
+      }, 1000)
+      this.setState(({ todoData }) => {
+        const idx = todoData.findIndex((el) => el.id === id)
+        const data = [...todoData]
+        data[idx].timerId = timerId
+        data[idx].isTimerOn = true
+
+        return {
+          todoData: data,
+        }
+      })
+    }
+  }
+
+  stopTimer = (id) => {
+    const { isTimerOn } = this.state.todoData.find((el) => el.id === id)
+    if (isTimerOn) {
+      const { timerId } = this.state.todoData.find((el) => el.id === id)
+      this.setState(({ todoData }) => {
+        const idx = todoData.findIndex((el) => el.id === id)
+        const data = [...todoData]
+        data[idx].isTimerOn = false
+
+        return {
+          todoData: data,
+        }
+      })
+      clearInterval(timerId)
+    }
+  }
+
   render() {
     const { todoData, activeFilter } = this.state
     const filteredTodoData = this.taskFilter()
     const todoCount = todoData.filter((el) => !el.completed).length
     return (
-      <section className="todoapp">
-        <header className="header">
-          <h1>Todos</h1>
-          <NewTaskForm onTaskAdded={this.onTaskAdded} />
-        </header>
-        <section className="main">
-          <TaskList
-            onDeleted={this.deleteTask}
-            editTask={this.editTask}
-            editingTask={this.editingTask}
-            onToggleCompleted={this.onToggleCompleted}
-            tasks={filteredTodoData}
-          />
-          <Footer
-            toDo={todoCount}
-            btnFilter={this.btnFilter}
-            activeFilter={activeFilter}
-            clearCompleted={this.clearCompleted}
-          />
+      <React.StrictMode>
+        <section className="todoapp">
+          <header className="header">
+            <h1>Todos</h1>
+            <NewTaskForm onTaskAdded={this.onTaskAdded} />
+          </header>
+          <section className="main">
+            <TaskList
+              onDeleted={this.deleteTask}
+              editTask={this.editTask}
+              editingTask={this.editingTask}
+              onToggleCompleted={this.onToggleCompleted}
+              tasks={filteredTodoData}
+              startTimer={this.startTimer}
+              stopTimer={this.stopTimer}
+            />
+            <Footer
+              toDo={todoCount}
+              btnFilter={this.btnFilter}
+              activeFilter={activeFilter}
+              clearCompleted={this.clearCompleted}
+            />
+          </section>
         </section>
-      </section>
+      </React.StrictMode>
     )
   }
 }
