@@ -5,34 +5,28 @@ import Task from '../Task'
 
 import './TaskList.css'
 
-class TaskList extends React.Component {
-  state = {
-    minute: this.props.minute,
-    second: this.props.second,
-  }
+function TaskList(props) {
+  const { tasks, onDeleted, onToggleCompleted, editTask, editingTask, startTimer, stopTimer } = props
 
-  render() {
-    const { tasks, onDeleted, onToggleCompleted, editTask, editingTask, startTimer, stopTimer } = this.props
-    const elements = tasks.map((item) => {
-      const { ...itemProps } = item
-      return (
-        <Task
-          key={item.id}
-          minute={item.minute}
-          second={item.second}
-          {...itemProps}
-          onDeleted={() => onDeleted(item.id)}
-          editTask={(label) => editTask(item.id, label)}
-          editingTask={() => editingTask(item.id)}
-          onToggleCompleted={() => onToggleCompleted(item.id)}
-          startTimer={() => startTimer(item.id)}
-          stopTimer={() => stopTimer(item.id)}
-        />
-      )
-    })
+  const elements = tasks.map((item) => {
+    const { ...itemProps } = item
+    return (
+      <Task
+        key={item.id}
+        minute={item.minute}
+        second={item.second}
+        {...itemProps}
+        onDeleted={() => onDeleted(item.id)}
+        editTask={(label) => editTask(item.id, label)}
+        editingTask={() => editingTask(item.id)}
+        onToggleCompleted={() => onToggleCompleted(item.id)}
+        startTimer={() => startTimer(item.id)}
+        stopTimer={() => stopTimer(item.id)}
+      />
+    )
+  })
 
-    return <ul className="todo-list">{elements}</ul>
-  }
+  return <ul className="todo-list">{elements}</ul>
 }
 
 TaskList.defaultProps = {
